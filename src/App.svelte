@@ -1,11 +1,13 @@
 <script>
   export let name;
   export let greet;
+  export let count_dominoes;
 </script>
 
 <main>
   <h1>Hello {name}!</h1>
-  <h3>This is something from rust: {greet}!</h3>
+  <h3>This is something from rust: {greet()}!</h3>
+  <h4>Domino count:{count_dominoes("dominoes/IMG-20210324-WA0000.jpg")}</h4>
 
   <p>
     Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn

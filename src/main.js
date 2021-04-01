@@ -8,7 +8,9 @@ const init = async () => {
 		target: document.body,
 		props: {
 			name: 'world',
-			greet: rust.greet()
+			greet: rust.greet,
+			count_dominoes: rust.count_dominoes_from_path
+
 		}
 	});
 };
