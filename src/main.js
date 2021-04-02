@@ -9,7 +9,7 @@ const init = async () => {
 		props: {
 			name: 'world',
 			greet: rust.greet,
-			count_dominoes: rust.count_dominoes_from_path
+			count_dominoes: rust.count_dominoes_from_base64
 
 		}
 	});
