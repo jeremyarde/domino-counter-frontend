@@ -3,25 +3,49 @@
   export let greet;
   export let count_dominoes;
   let fileinput = null;
+  let result = 0;
+  let width;
+  let height;
 
   const onFileSelected = (e) => {
     let image = e.target.files[0];
     let reader = new FileReader();
+
     reader.readAsDataURL(image);
+    reader.onload = function (e) {
+      //Initiate the JavaScript Image object.
+      var image = new Image();
+
+      //Set the Base64 string return from FileReader as source.
+      image.src = e.target.result;
+
+      //Validate the File Height and Width.
+      image.onload = () => {
+        height = Number(image.naturalHeight);
+        width = Number(image.naturalWidth);
+        console.log(`[INNER] width: ${width}, height: ${height}`);
+        console.log(
+          `[INNER] type width: ${typeof width}, type height: ${typeof height}`
+        );
+      };
+    };
+
+    reader = new FileReader();
+    reader.readAsArrayBuffer(image);
     reader.onload = (e) => {
-      fileinput = e.target.result;
+      fileinput = new Uint8Array(e.target.result);
       console.log(`${fileinput} uploaded something`);
       console.log("File input changed");
-      result = count_dominoes(fileinput);
+      console.log(`dimensions: ${width} x ${height}`);
+      result = count_dominoes(fileinput, width, height);
       console.log(`result: ${result}`);
     };
   };
 
-  let result;
-  if (fileinput != null) {
-    console.log("File input changed");
-    result = count_dominoes(fileinput);
-  }
+  // if (fileinput != null) {
+  //   console.log("File input changed");
+  //   result = count_dominoes(fileinput, width, height);
+  // }
   // let other_result = count_dominoes("dominoes/IMG-20210324-WA0000.jpg");
   // let other_result = count_dominoes(fileinput);
 </script>
