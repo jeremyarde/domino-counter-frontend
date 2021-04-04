@@ -7,40 +7,79 @@
   let width;
   let height;
 
+  let canvas;
+
   const onFileSelected = (e) => {
-    let image = e.target.files[0];
-    let reader = new FileReader();
+    const ctx = canvas.getContext("2d");
 
-    reader.readAsDataURL(image);
-    reader.onload = function (e) {
-      //Initiate the JavaScript Image object.
-      var image = new Image();
+    var reader = new FileReader();
+    reader.onload = function (event) {
+      var img = new Image();
+      img.onload = function () {
+        console.log(canvas);
+        console.log(`${img.naturalHeight}, ${img.naturalWidth}`);
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        ctx.drawImage(img, 0, 0);
+        // img.style.display = "none";
 
-      //Set the Base64 string return from FileReader as source.
-      image.src = e.target.result;
+        var myData = ctx.getImageData(0, 0, img.width, img.height);
+        console.log("data:");
+        console.log(myData.data);
 
-      //Validate the File Height and Width.
-      image.onload = () => {
-        height = Number(image.naturalHeight);
-        width = Number(image.naturalWidth);
-        console.log(`[INNER] width: ${width}, height: ${height}`);
-        console.log(
-          `[INNER] type width: ${typeof width}, type height: ${typeof height}`
+        result = count_dominoes(
+          myData.data,
+          img.naturalWidth,
+          img.naturalHeight
         );
+        console.log("Results of count:");
+        console.log(result);
       };
+      img.src = event.target.result;
     };
+    reader.readAsDataURL(e.target.files[0]);
 
-    reader = new FileReader();
-    reader.readAsArrayBuffer(image);
-    reader.onload = (e) => {
-      fileinput = new Uint8Array(e.target.result);
-      console.log(`${fileinput} uploaded something`);
-      console.log("File input changed");
-      console.log(`dimensions: ${width} x ${height}`);
-      result = count_dominoes(fileinput, width, height);
-      console.log(`result: ${result}`);
-    };
+    // let reader = new FileReader();
+    // console.log(image);
+
+    // reader.readAsDataURL(image);
+    // reader.onload = function (e) {
+    //   //Initiate the JavaScript Image object.
+    //   // ctx.drawImage(image, 0, 0);
+
+    //   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    //   console.log("imagedata:");
+    //   console.log(imageData);
+
+    //Set the Base64 string return from FileReader as source.
+    // image.src = e.target.result;
+
+    // //Validate the File Height and Width.
+    // image.onload = () => {
+    //   height = Number(image.naturalHeight);
+    //   width = Number(image.naturalWidth);
+    //   console.log(`[INNER] width: ${width}, height: ${height}`);
+    //   console.log(
+    //     `[INNER] type width: ${typeof width}, type height: ${typeof height}`
+    //   );
+    // };
   };
+
+  //   reader = new FileReader();
+  //   reader.readAsArrayBuffer(image);
+  //   reader.onload = (e) => {
+  //     console.log("Result:");
+  //     console.log(e.target.result);
+  //     fileinput = new Uint8Array(e.target.result);
+  //     console.log("File:");
+  //     console.log(fileinput);
+  //     // console.log(`${JSON.serialize(fileinput)}`);
+  //     console.log("File input changed");
+  //     console.log(`dimensions: ${width} x ${height}`);
+  //     result = count_dominoes(fileinput, width, height);
+  //     console.log(`result: ${result}`);
+  //   };
+  // };
 
   // if (fileinput != null) {
   //   console.log("File input changed");
@@ -51,6 +90,7 @@
 </script>
 
 <main>
+  <canvas bind:this={canvas} width={32} height={32} />
   <input bind:value={name} />
 
   <input
