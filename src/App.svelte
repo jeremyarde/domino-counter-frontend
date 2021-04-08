@@ -102,7 +102,7 @@
   />
 
   <h1>Hello {name}!</h1>
-  <h3>This is something from rust: {greet(name)}!</h3>
+  <!-- <h3>This is something from rust: {greet(name)}!</h3> -->
   <h4>Domino count:{result}</h4>
 
   <p>

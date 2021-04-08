@@ -1,6 +1,8 @@
 # domino-counter-frontend
  
-
+```
+npm run dev
+```
 // 5-9.jpg edges should be:
 Found bottom edge at 216
 Found bottom edge at 15
