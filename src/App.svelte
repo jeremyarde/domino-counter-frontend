@@ -1,13 +1,46 @@
 <script>
-  export let name;
-  export let greet;
   export let count_dominoes;
+
   let fileinput = null;
   let result = 0;
   let width;
   let height;
-
+  let found_domino_string = "DOMINO HERE";
+  let top_left;
+  let bottom_right;
+  let currentImage;
   let canvas;
+  let edgePositions = [];
+
+  function handleMousemove(event) {
+    console.log(canvas.getBoundingClientRect());
+    let canvas_rectangle = canvas.getBoundingClientRect();
+
+    var context = canvas.getContext("2d");
+    context.clearRect(0,0, canvas.width, canvas.height);
+    canvas.width = currentImage.naturalWidth;
+    canvas.height = currentImage.naturalHeight;
+    context.drawImage(currentImage, 0, 0);
+
+    let x = event.clientX - canvas_rectangle.left;
+		let y = event.clientY - canvas_rectangle.top;
+    edgePositions.push({"x": x, "y":y});
+
+    if (edgePositions.length > 2) {
+      edgePositions.shift()
+    }
+
+    edgePositions.forEach(pos => {
+      console.log(pos.x);
+      console.log(pos.y);
+      context.fillStyle = "#000000";
+      context.beginPath();
+      context.arc(pos.x, pos.y, 20, 0, 2*Math.PI);
+      context.fill();
+    });
+
+    console.log(`${x}, ${y }`);
+	}
 
   const onFileSelected = (e) => {
     const ctx = canvas.getContext("2d");
@@ -16,10 +49,12 @@
     reader.onload = function (event) {
       var img = new Image();
       img.onload = function () {
+        currentImage = img;
         console.log(canvas);
         console.log(`${img.naturalHeight}, ${img.naturalWidth}`);
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;
+
         ctx.drawImage(img, 0, 0);
         // img.style.display = "none";
 
@@ -27,72 +62,30 @@
         console.log("data:");
         console.log(myData.data);
 
-        result = count_dominoes(
-          myData.data,
-          img.naturalWidth,
-          img.naturalHeight
-        );
-        console.log("Results of count:");
-        console.log(result);
+        // send the image data to wasm for counting
+        // result = count_dominoes(
+        //   myData.data,
+        //   img.naturalWidth,
+        //   img.naturalHeight
+        // );
+        // console.log("Results of count:");
+        // console.log(result);
       };
       img.src = event.target.result;
     };
     reader.readAsDataURL(e.target.files[0]);
-
-    // let reader = new FileReader();
-    // console.log(image);
-
-    // reader.readAsDataURL(image);
-    // reader.onload = function (e) {
-    //   //Initiate the JavaScript Image object.
-    //   // ctx.drawImage(image, 0, 0);
-
-    //   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    //   console.log("imagedata:");
-    //   console.log(imageData);
-
-    //Set the Base64 string return from FileReader as source.
-    // image.src = e.target.result;
-
-    // //Validate the File Height and Width.
-    // image.onload = () => {
-    //   height = Number(image.naturalHeight);
-    //   width = Number(image.naturalWidth);
-    //   console.log(`[INNER] width: ${width}, height: ${height}`);
-    //   console.log(
-    //     `[INNER] type width: ${typeof width}, type height: ${typeof height}`
-    //   );
-    // };
   };
 
-  //   reader = new FileReader();
-  //   reader.readAsArrayBuffer(image);
-  //   reader.onload = (e) => {
-  //     console.log("Result:");
-  //     console.log(e.target.result);
-  //     fileinput = new Uint8Array(e.target.result);
-  //     console.log("File:");
-  //     console.log(fileinput);
-  //     // console.log(`${JSON.serialize(fileinput)}`);
-  //     console.log("File input changed");
-  //     console.log(`dimensions: ${width} x ${height}`);
-  //     result = count_dominoes(fileinput, width, height);
-  //     console.log(`result: ${result}`);
-  //   };
-  // };
+  
 
-  // if (fileinput != null) {
-  //   console.log("File input changed");
-  //   result = count_dominoes(fileinput, width, height);
-  // }
-  // let other_result = count_dominoes("dominoes/IMG-20210324-WA0000.jpg");
-  // let other_result = count_dominoes(fileinput);
 </script>
 
 <main>
-  <canvas bind:this={canvas} width={32} height={32} />
-  <input bind:value={name} />
-
+  <div>
+    <h2>Domino count: {result}</h2>
+    <h3>Found dominoes: {found_domino_string}</h3>
+  </div>
+<div>
   <input
     type="file"
     accept="image/*"
@@ -100,15 +93,9 @@
     on:change={(e) => onFileSelected(e)}
     bind:this={fileinput}
   />
+</div>
+  <canvas bind:this={canvas} width={32} height={32} on:click={handleMousemove} />
 
-  <h1>Hello {name}!</h1>
-  <!-- <h3>This is something from rust: {greet(name)}!</h3> -->
-  <h4>Domino count:{result}</h4>
-
-  <p>
-    Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn
-    how to build Svelte apps.
-  </p>
 </main>
 
 <style>
