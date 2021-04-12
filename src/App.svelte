@@ -7,6 +7,8 @@
   let found_domino_string = "Please upload photo";
   let currentImage;
   let canvas;
+  let width;
+  let height;
   let edgePositions = [];
 
   let currentDominoImage = null;
@@ -14,15 +16,57 @@
   let currentDominoImageWidth = 0;
   let currentDominoImageCropSection = null;
 
+  function rotateImage(event) {
+    console.log("rotate image function");
+    var context = canvas.getContext("2d");
+    console.log(currentImage);
+    currentImage.style.transform = "rotate(90deg)";
+
+    // context.rotate((90 * Math.PI) / 180);
+    // context.drawImage(currentImage, 0, 0);
+    redrawImage();
+  }
+
+  function redrawImage() {
+    var context = canvas.getContext("2d");
+
+    var hRatio = canvas.width / currentImage.width;
+    var vRatio = canvas.height / currentImage.height;
+    var ratio = Math.min(hRatio, vRatio);
+    context.drawImage(
+      currentImage,
+      0,
+      0,
+      currentImage.width,
+      currentImage.height,
+      0,
+      0,
+      currentImage.width * ratio,
+      currentImage.height * ratio
+    );
+  }
+
   function handleMousemove(event) {
     console.log(canvas.getBoundingClientRect());
     let canvas_rectangle = canvas.getBoundingClientRect();
 
     var context = canvas.getContext("2d");
     context.clearRect(0, 0, canvas.width, canvas.height);
-    canvas.width = currentImage.naturalWidth;
-    canvas.height = currentImage.naturalHeight;
-    context.drawImage(currentImage, 0, 0);
+    // canvas.width = currentImage.naturalWidth;
+    // canvas.height = currentImage.naturalHeight;
+    // context.drawImage(currentImage, 0, 0);
+    // context.drawImage(
+    //   currentImage,
+    //   0,
+    //   0,
+    //   currentImage.width,
+    //   currentImage.height,
+    //   0,
+    //   0,
+    //   currentImage.width * ratio,
+    //   currentImage.height * ratio
+    // );
+    redrawImage();
 
     let x = event.clientX - canvas_rectangle.left;
     let y = event.clientY - canvas_rectangle.top;
@@ -38,7 +82,7 @@
       console.log(pos.y);
       context.fillStyle = "#3aeb34";
       context.beginPath();
-      context.arc(pos.x, pos.y, 20, 0, 2 * Math.PI);
+      context.arc(pos.x, pos.y, 5, 0, 2 * Math.PI);
       context.fill();
     });
 
@@ -129,10 +173,12 @@
         currentImage = img;
         console.log(canvas);
         console.log(`${img.naturalHeight}, ${img.naturalWidth}`);
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
+        // canvas.width = img.naturalWidth;
+        // canvas.height = img.naturalHeight;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        redrawImage();
 
-        ctx.drawImage(img, 0, 0);
+        // ctx.drawImage(img, 0, 0);
         // img.style.display = "none";
 
         var myData = ctx.getImageData(0, 0, img.width, img.height);
@@ -158,13 +204,19 @@
       bind:this={fileinput}
     />
   </div>
-  <canvas
+  <!-- <canvas
     bind:this={canvas}
     width={32}
     height={32}
     on:click={handleMousemove}
-  />
+  /> -->
+
+  <div class="container">
+    <canvas bind:this={canvas} {width} {height} on:click={handleMousemove} />
+  </div>
+
   <div>
+    <button on:click={rotateImage}>ROTATE</button>
     <button on:click={onSubmitPicture}>ANALYZE PICTURE</button>
     <h2>Count: {result}<br />Dominoes Found: {found_domino_string}</h2>
   </div>

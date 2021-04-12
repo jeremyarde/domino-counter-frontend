@@ -1,8 +1,16 @@
 # domino-counter-frontend
  
+
+Run dev
 ```
 npm run dev
 ```
+
+Make available publicly
+```
+npx localtunnel --port 5000
+```
+
 // 5-9.jpg edges should be:
 Found bottom edge at 216
 Found bottom edge at 15
