@@ -7,8 +7,9 @@
   let found_domino_string = "Please upload photo";
   let currentImage;
   let canvas;
-  let width;
-  let height;
+  let width = 0;
+  let height = 0;
+
   let edgePositions = [];
 
   let currentDominoImage = null;
@@ -20,18 +21,29 @@
     console.log("rotate image function");
     var context = canvas.getContext("2d");
     console.log(currentImage);
+    console.log(`w: ${currentImage.width}, h: ${currentImage.height}`);
+
     currentImage.style.transform = "rotate(90deg)";
 
     // context.rotate((90 * Math.PI) / 180);
     // context.drawImage(currentImage, 0, 0);
     redrawImage();
+    console.log(`w: ${currentImage.width}, h: ${currentImage.height}`);
   }
 
   function redrawImage() {
+    console.log("redrawing");
+    console.log(`image: ${currentImage}`);
     var context = canvas.getContext("2d");
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    console.log(`window stuff: ${window.innerWidth}`);
 
     var hRatio = canvas.width / currentImage.width;
     var vRatio = canvas.height / currentImage.height;
+    console.log(`hRatio: ${hRatio}, vRatio: ${vRatio}`);
+
     var ratio = Math.min(hRatio, vRatio);
     context.drawImage(
       currentImage,
@@ -175,6 +187,13 @@
         console.log(`${img.naturalHeight}, ${img.naturalWidth}`);
         // canvas.width = img.naturalWidth;
         // canvas.height = img.naturalHeight;
+
+        width = window.innerWidth / 3;
+        height = window.innerHeight / 3;
+
+        canvas.width = width;
+        canvas.height = height;
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         redrawImage();
 
