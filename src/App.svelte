@@ -7,8 +7,11 @@
   let found_domino_string = "Please upload photo";
   let currentImage;
   let canvas;
-  let width = 0;
-  let height = 0;
+
+  // change canvas width and height to be whichever dimension hits
+  // the max value (window/3) first.
+  let width = window.innerWidth / 3;
+  let height = window.innerHeight / 3;
 
   let edgePositions = [];
 
@@ -22,8 +25,7 @@
     var context = canvas.getContext("2d");
     console.log(currentImage);
     console.log(`w: ${currentImage.width}, h: ${currentImage.height}`);
-
-    currentImage.style.transform = "rotate(90deg)";
+    currentImage = currentImage.style.transform = "rotate(90deg)";
 
     // context.rotate((90 * Math.PI) / 180);
     // context.drawImage(currentImage, 0, 0);
@@ -31,30 +33,39 @@
     console.log(`w: ${currentImage.width}, h: ${currentImage.height}`);
   }
 
-  function redrawImage() {
+  function redrawImage(image) {
+    let imageToDraw;
+    if (image != null) {
+      imageToDraw = image;
+    } else {
+      imageToDraw = currentImage;
+    }
+    // console.log("redrawing:");
+    // console.log(imageToDraw);
+
     console.log("redrawing");
-    console.log(`image: ${currentImage}`);
+    console.log(`image: ${imageToDraw}`);
     var context = canvas.getContext("2d");
 
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     console.log(`window stuff: ${window.innerWidth}`);
 
-    var hRatio = canvas.width / currentImage.width;
-    var vRatio = canvas.height / currentImage.height;
+    var hRatio = canvas.width / imageToDraw.width;
+    var vRatio = canvas.height / imageToDraw.height;
     console.log(`hRatio: ${hRatio}, vRatio: ${vRatio}`);
 
     var ratio = Math.min(hRatio, vRatio);
     context.drawImage(
-      currentImage,
+      imageToDraw,
       0,
       0,
-      currentImage.width,
-      currentImage.height,
+      imageToDraw.width,
+      imageToDraw.height,
       0,
       0,
-      currentImage.width * ratio,
-      currentImage.height * ratio
+      imageToDraw.width * ratio,
+      imageToDraw.height * ratio
     );
   }
 
@@ -64,20 +75,7 @@
 
     var context = canvas.getContext("2d");
     context.clearRect(0, 0, canvas.width, canvas.height);
-    // canvas.width = currentImage.naturalWidth;
-    // canvas.height = currentImage.naturalHeight;
-    // context.drawImage(currentImage, 0, 0);
-    // context.drawImage(
-    //   currentImage,
-    //   0,
-    //   0,
-    //   currentImage.width,
-    //   currentImage.height,
-    //   0,
-    //   0,
-    //   currentImage.width * ratio,
-    //   currentImage.height * ratio
-    // );
+
     redrawImage();
 
     let x = event.clientX - canvas_rectangle.left;
@@ -176,41 +174,40 @@
   }
 
   const onFileSelected = (e) => {
-    const ctx = canvas.getContext("2d");
+    var context = canvas.getContext("2d");
 
     var reader = new FileReader();
     reader.onload = function (event) {
       var img = new Image();
       img.onload = function () {
+        // console.log("img on load");
+        // console.log(img);
         currentImage = img;
         console.log(canvas);
         console.log(`${img.naturalHeight}, ${img.naturalWidth}`);
         // canvas.width = img.naturalWidth;
         // canvas.height = img.naturalHeight;
 
-        width = window.innerWidth / 3;
-        height = window.innerHeight / 3;
-
-        canvas.width = width;
-        canvas.height = height;
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        redrawImage();
-
+        // ctx.clearRect(0, 0, canvas.width, canvas.height);
         // ctx.drawImage(img, 0, 0);
         // img.style.display = "none";
 
-        var myData = ctx.getImageData(0, 0, img.width, img.height);
-
         console.log("Image set. Ready to analyze.");
         // console.log(myData);
+        var myData = context.getImageData(0, 0, img.width, img.height);
         currentDominoImage = myData.data;
         currentDominoImageWidth = img.width;
         currentDominoImageHeight = img.height;
+        redrawImage(img);
       };
       img.src = event.target.result;
+      // currentImage = img;
+
+      redrawImage(img);
     };
+
     reader.readAsDataURL(e.target.files[0]);
+    // redrawImage();
   };
 </script>
 
