@@ -8,10 +8,12 @@
   let currentImage;
   let canvas;
 
-  // change canvas width and height to be whichever dimension hits
-  // the max value (window/3) first.
-  let width = window.innerWidth / 3;
-  let height = window.innerHeight / 3;
+  //TODO
+  // scale image and canvas to at most window width/3 or height/3
+  // let width = window.innerWidth / 3;
+  // let height = window.innerHeight / 3;
+  let width;
+  let height;
 
   let edgePositions = [];
 
@@ -25,7 +27,7 @@
     var context = canvas.getContext("2d");
     console.log(currentImage);
     console.log(`w: ${currentImage.width}, h: ${currentImage.height}`);
-    currentImage = currentImage.style.transform = "rotate(90deg)";
+    currentImage.style.transform = "rotate(90deg)";
 
     // context.rotate((90 * Math.PI) / 180);
     // context.drawImage(currentImage, 0, 0);
@@ -48,14 +50,24 @@
     var context = canvas.getContext("2d");
 
     context.clearRect(0, 0, canvas.width, canvas.height);
-
     console.log(`window stuff: ${window.innerWidth}`);
 
-    var hRatio = canvas.width / imageToDraw.width;
-    var vRatio = canvas.height / imageToDraw.height;
-    console.log(`hRatio: ${hRatio}, vRatio: ${vRatio}`);
+    let maxHeight = Math.min(window.innerHeight / 3, imageToDraw.height);
+    let maxWidth = Math.min(window.innerWidth / 3, imageToDraw.width);
+
+    console.log("Max's:", maxHeight, maxWidth);
+    console.log("image dims:", image.height, image.width);
+
+    var hRatio = maxWidth / imageToDraw.width;
+    var vRatio = maxHeight / imageToDraw.height;
+    console.log(`widthRatio: ${hRatio}, heightRatio: ${vRatio}`);
 
     var ratio = Math.min(hRatio, vRatio);
+    canvas.height = window.innerHeight * ratio;
+    canvas.width = window.innerWidth * ratio;
+    // width = window.innerWidth * ratio;
+    // height = window.innerHeight * ratio;
+
     context.drawImage(
       imageToDraw,
       0,
@@ -228,7 +240,7 @@
   /> -->
 
   <div class="container">
-    <canvas bind:this={canvas} {width} {height} on:click={handleMousemove} />
+    <canvas bind:this={canvas} on:click={handleMousemove} />
   </div>
 
   <div>
