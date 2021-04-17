@@ -7,13 +7,14 @@
   let found_domino_string = "Please upload photo";
   let currentImage;
   let canvas;
+  let imageRotation = 0;
 
   //TODO
   // scale image and canvas to at most window width/3 or height/3
   // let width = window.innerWidth / 3;
   // let height = window.innerHeight / 3;
-  let width;
-  let height;
+  // let width;
+  // let height;
 
   let edgePositions = [];
 
@@ -23,16 +24,54 @@
   let currentDominoImageCropSection = null;
 
   function rotateImage(event) {
-    console.log("rotate image function");
     var context = canvas.getContext("2d");
-    console.log(currentImage);
-    console.log(`w: ${currentImage.width}, h: ${currentImage.height}`);
-    currentImage.style.transform = "rotate(90deg)";
+    // context.save();
+    // console.log("rotate image function");
+    // var context = canvas.getContext("2d");
+    // context.rotate(imageRotation);
+    // // console.log(currentImage);
+    // // console.log(`w: ${currentImage.width}, h: ${currentImage.height}`);
+    // imageRotation += 90;
+    // let newRotatedImage = currentImage;
+    // newRotatedImage.style.transform = `rotate(${imageRotation}deg)`;
+    // canvas.style.transform = `rotate(${imageRotation}deg)`;
 
-    // context.rotate((90 * Math.PI) / 180);
-    // context.drawImage(currentImage, 0, 0);
-    redrawImage();
-    console.log(`w: ${currentImage.width}, h: ${currentImage.height}`);
+    // currentImage = newRotatedImage;
+    // console.log("newly rotated:", currentImage);
+    // context.restore();
+    // // context.rotate((90 * Math.PI) / 180);
+    // // context.drawImage(currentImage, 0, 0);
+    // redrawImage();
+    // console.log(`w: ${currentImage.width}, h: ${currentImage.height}`);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    // let thing = canvas.width;
+    // canvas.width = canvas.height;
+    // canvas.height = thing;
+
+    context.translate(canvas.width / 2, canvas.height / 2);
+
+    // roate the canvas by +90% (==Math.PI/2)
+    context.rotate(Math.PI / 2);
+
+    // let thing = canvas.width;
+    // canvas.width = canvas.height;
+    // canvas.height = thing;
+
+    // draw the signature
+    // since images draw from top-left offset the draw by 1/2 width & height
+    context.drawImage(
+      currentImage,
+      -currentImage.width / 2,
+      -currentImage.height / 2
+    );
+
+    // un-rotate the canvas by -90% (== -Math.PI/2)
+
+    context.rotate(-Math.PI / 2);
+
+    // un-translate the canvas back to origin==top-left canvas
+
+    context.translate(-canvas.width / 2, -canvas.height / 2);
   }
 
   function redrawImage(image) {
@@ -42,31 +81,30 @@
     } else {
       imageToDraw = currentImage;
     }
-    // console.log("redrawing:");
-    // console.log(imageToDraw);
+    console.log("redrawing:");
+    console.log(imageToDraw);
 
     console.log("redrawing");
     console.log(`image: ${imageToDraw}`);
     var context = canvas.getContext("2d");
 
     context.clearRect(0, 0, canvas.width, canvas.height);
-    console.log(`window stuff: ${window.innerWidth}`);
 
-    let maxHeight = Math.min(window.innerHeight / 3, imageToDraw.height);
-    let maxWidth = Math.min(window.innerWidth / 3, imageToDraw.width);
+    // console.log(`window stuff: ${window.innerWidth}`);
 
-    console.log("Max's:", maxHeight, maxWidth);
-    console.log("image dims:", image.height, image.width);
+    let maxHeight = Math.min(window.innerHeight * 1.5, imageToDraw.height);
+    let maxWidth = Math.min(window.innerWidth * 1.5, imageToDraw.width);
+
+    // console.log("Max's:", maxHeight, maxWidth);
+    // console.log("image dims:", imageToDraw.height, imageToDraw.width);
+    // console.log("Canvas dims:", canvas.clientHeight, canvas.clientWidth);
 
     var hRatio = maxWidth / imageToDraw.width;
     var vRatio = maxHeight / imageToDraw.height;
-    console.log(`widthRatio: ${hRatio}, heightRatio: ${vRatio}`);
-
     var ratio = Math.min(hRatio, vRatio);
-    canvas.height = window.innerHeight * ratio;
-    canvas.width = window.innerWidth * ratio;
-    // width = window.innerWidth * ratio;
-    // height = window.innerHeight * ratio;
+
+    canvas.width = imageToDraw.width * ratio;
+    canvas.height = imageToDraw.height * ratio;
 
     context.drawImage(
       imageToDraw,
@@ -159,7 +197,6 @@
 
         console.log("domino image section (JS)");
         console.log(currentDominoImageCropSection);
-
         wasm_result = count_dominoes(
           imageData,
           currentDominoImageCropSection["x_len"],
@@ -244,7 +281,7 @@
   </div>
 
   <div>
-    <button on:click={rotateImage}>ROTATE</button>
+    <!-- <button on:click={rotateImage}>ROTATE</button> -->
     <button on:click={onSubmitPicture}>ANALYZE PICTURE</button>
     <h2>Count: {result}<br />Dominoes Found: {found_domino_string}</h2>
   </div>
