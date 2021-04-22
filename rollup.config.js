@@ -46,7 +46,7 @@ export default {
 		}),
 		rust({
 			verbose: true,
-			serverPath: "/build/"
+			serverPath: "build/"
 		  }),
 
 		// we'll extract any component CSS out into
