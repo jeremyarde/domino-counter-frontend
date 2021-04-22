@@ -3,6 +3,8 @@
 
   let fileinput = null;
   let result = 0;
+  let resizeButton = false;
+  let resizeRatio = 1.0;
 
   let found_domino_string = "Please upload photo";
   let currentImage;
@@ -22,6 +24,21 @@
   let currentDominoImageHeight = 0;
   let currentDominoImageWidth = 0;
   let currentDominoImageCropSection = null;
+
+  function handleResizeButton() {
+    console.log("Resize button old:", resizeButton);
+    if (resizeButton == true) {
+      resizeButton = false;
+    } else {
+      resizeButton = true;
+    }
+    console.log("Resize button new:", resizeButton);
+    redrawImage();
+  }
+
+  function handleResizeSlider() {
+    redrawImage();
+  }
 
   function rotateImage(event) {
     var context = canvas.getContext("2d");
@@ -75,13 +92,16 @@
   }
 
   function redrawImage(image) {
+    let ratio = resizeRatio;
     let imageToDraw;
+
     if (image != null) {
       imageToDraw = image;
     } else {
       imageToDraw = currentImage;
     }
     console.log("redrawing:");
+    console.log("settings:", "\nratio:", ratio);
     console.log(imageToDraw);
 
     console.log("redrawing");
@@ -92,16 +112,19 @@
 
     // console.log(`window stuff: ${window.innerWidth}`);
 
-    let maxHeight = Math.min(window.innerHeight * 1.5, imageToDraw.height);
-    let maxWidth = Math.min(window.innerWidth * 1.5, imageToDraw.width);
-
-    // console.log("Max's:", maxHeight, maxWidth);
-    // console.log("image dims:", imageToDraw.height, imageToDraw.width);
-    // console.log("Canvas dims:", canvas.clientHeight, canvas.clientWidth);
-
-    var hRatio = maxWidth / imageToDraw.width;
-    var vRatio = maxHeight / imageToDraw.height;
-    var ratio = Math.min(hRatio, vRatio);
+    // scaling the images to fit the screen
+    if (resizeButton == true) {
+      // let maxHeight = Math.min(window.innerHeight * ratio, imageToDraw.height);
+      // let maxWidth = Math.min(window.innerWidth * ratio, imageToDraw.width);
+      // console.log("Max's:", maxHeight, maxWidth);
+      // console.log("image dims:", imageToDraw.height, imageToDraw.width);
+      // console.log("Canvas dims:", canvas.clientHeight, canvas.clientWidth);
+      // var hRatio = maxWidth / imageToDraw.width;
+      // var vRatio = maxHeight / imageToDraw.height;
+      // ratio = Math.min(hRatio, vRatio);
+    } else {
+      ratio = 1;
+    }
 
     canvas.width = imageToDraw.width * ratio;
     canvas.height = imageToDraw.height * ratio;
@@ -284,6 +307,29 @@
     <!-- <button on:click={rotateImage}>ROTATE</button> -->
     <button on:click={onSubmitPicture}>ANALYZE PICTURE</button>
     <h2>Count: {result}<br />Dominoes Found: {found_domino_string}</h2>
+  </div>
+  <h3>Settings:</h3>
+  <div>
+    <label>
+      <input
+        type="checkbox"
+        bind:checked={resizeButton}
+        on:click={handleResizeButton}
+      />
+
+      Resize images? (Bigger image = better results, slower analyzing)
+    </label>
+    <label>
+      <input
+        type="range"
+        step="0.1"
+        bind:value={resizeRatio}
+        min="0.1"
+        max="2.0"
+        on:change={handleResizeSlider}
+      />
+      <body>{resizeRatio} times screen width or height</body>
+    </label>
   </div>
   <h2 style="text-align: left">
     Instructions:<br />
